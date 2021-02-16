@@ -27,10 +27,10 @@ def email():
     message = "Hey bitch buy your tickets"
     port = 465
     pw = os.getenv('GMAIL_TOKEN')
-    ctx = ssl.create_default_context()
-    with smtplib.SMTP_SSL(GMAIL, port, context=ctx) as server:
-        server.login(ROOT_EMAIL, pw)
-        server.sendmail(ROOT_EMAIL, EMAILS, message) 
+    server_ssl = smtplib.SMTP(GMAIL, port)
+    server_ssl.ehlo()
+    server_ssl.login(ROOT_EMAIL, pw)
+    server_ssl.sendmail(ROOT_EMAIL, EMAILS, message) 
 
 def main():
     # Seed time and set up headless chrome.
@@ -54,7 +54,3 @@ def main():
     
 if __name__ == "__main__":
     main()
-
-
-
-
