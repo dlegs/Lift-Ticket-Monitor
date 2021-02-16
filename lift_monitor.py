@@ -33,7 +33,6 @@ def email():
         server.sendmail(ROOT_EMAIL, EMAILS, message) 
 
 def main():
-    email()
     # Seed time and set up headless chrome.
     start = time.time()
     chrome_options = Options()
