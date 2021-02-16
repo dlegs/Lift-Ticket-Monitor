@@ -3,13 +3,15 @@
 import os
 import smtplib, ssl
 import time
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys  
 from selenium.webdriver.chrome.options import Options 
 
 GMAIL = "smtp-relay.gmail.com"
 ROOT_EMAIL = "srv@legg.io"
-EMAILS = ["dylan@legg.io, ajw592@nyu.edu"]
+EMAILS = "dylan@legg.io, ajw592@nyu.edu"
 TICKET_URL = "https://www.huntermtn.com/plan-your-trip/lift-access/tickets.aspx?startDate=02%2F20%2F2021&numberOfDays=2&ageGroup=Adult"
 RESULTS_CLASS = "liftTicketsResults"
 
@@ -24,13 +26,34 @@ def get_results(driver):
     return results
 
 def email():
-    message = "Hey bitch buy your tickets"
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "Lift Tickets Are Available"
+    message["From"] = ROOT_EMAIL
+    message["To"] = EMAILS
+
+    text = "Hey bitch buy your lift tickets"
+    html = """\
+<html>
+  <body>
+    <p>Hey bitch buy your <a href="https://www.huntermtn.com/plan-your-trip/lift-access/tickets.aspx?startDate=02%2F20%2F2021&numberOfDays=2&ageGroup=Adult">lift tickets</a> 
+    </p>
+  </body>
+</html>
+"""
+    part1 = MIMEText(text, "plain")
+    part2 = MIMEText(html, "html")
+    message.attach(part1)
+    message.attach(part2)
+
     port = 465
     pw = os.getenv('GMAIL_TOKEN')
-    server_ssl = smtplib.SMTP(GMAIL, port)
-    server_ssl.ehlo()
-    server_ssl.login(ROOT_EMAIL, pw)
-    server_ssl.sendmail(ROOT_EMAIL, EMAILS, message) 
+    try:
+        server = smtplib.SMTP_SSL(GMAIL, port)
+        server.ehlo()
+        server.login(ROOT_EMAIL, pw)
+        server.sendmail(ROOT_EMAIL, EMAILS, message.as_string()) 
+    except Exception as e:
+        print(e)
 
 def main():
     # Seed time and set up headless chrome.
